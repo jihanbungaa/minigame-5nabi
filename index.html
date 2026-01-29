@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Susun Kisah Ajaib</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:'Nunito',sans-serif;
+  background:linear-gradient(180deg,#fcb3cc,#FFF);
+  text-align:center;
+  overflow-x:hidden;
+}
+
+/* HEADER */
+header{
+  padding:20px;
+}
+
+h1{
+  color:#0277BD;
+  font-size:1.8rem;
+  animation:bounce 1.5s infinite;
+}
+
+@keyframes bounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-6px)}
+}
+
+.level{
+  font-size:.95rem;
+  background:linear-gradient(45deg,#FF80AB,#FF4081);
+  color:#fff;
+  display:inline-block;
+  padding:8px 18px;
+  border-radius:30px;
+  margin-top:6px;
+  box-shadow:0 4px 0 #C2185B;
+}
+
+/* PROGRESS */
+.progress{
+  margin:14px auto;
+  width:85%;
+  height:14px;
+  background:#E1F5FE;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#4FC3F7,#0288D1);
+  transition:.4s;
+}
+
+/* AREA */
+.area{padding:16px}
+
+.slot{
+  background:#E0F7FA;
+  border:3px dashed #4FC3F7;
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:12px;
+  font-weight:700;
+  color:#0288D1;
+  transition:.3s;
+}
+
+.slot.success{
+  background:#C8FACC;
+  border-color:#4CAF50;
+  animation:glow .6s;
+}
+
+@keyframes glow{
+  0%{box-shadow:0 0 0 #4CAF50}
+  100%{box-shadow:0 0 18px #81C784}
+}
+
+/* CARD */
+.card{
+  background:#9ab1fb;
+  margin:10px 0;
+  padding:16px;
+  border-radius:22px;
+  box-shadow:0 6px 0 #BBDEFB;
+  cursor:grab;
+  font-size:1rem;
+  transition:.2s;
+}
+
+.card:active{
+  transform:scale(.95);
+  cursor:grabbing;
+}
+
+/* BUTTON */
+button{
+  margin:20px;
+  padding:16px 28px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(45deg,#FF80AB,#FF4081);
+  color:#fff;
+  font-weight:900;
+  font-size:1rem;
+  box-shadow:0 5px 0 #C2185B;
+}
+
+button:active{
+  transform:translateY(3px);
+  box-shadow:0 2px 0 #C2185B;
+}
+
+/* CONFETTI */
+.confetti{
+  position:fixed;
+  width:8px;
+  height:8px;
+  background:red;
+  top:-10px;
+  animation:fall 3s linear forwards;
+}
+
+@keyframes fall{
+  to{
+    transform:translateY(110vh) rotate(360deg);
+    opacity:0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🧩 Susun Kisah Ajaib</h1>
+  <div class="level" id="levelTitle"></div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+</header>
+
+<div class="area">
+  <div id="slots"></div>
+  <h3>👇 Seret & Susun Cerita</h3>
+  <div id="cards"></div>
+</div>
+
+<button onclick="nextLevel()" id="nextBtn" style="display:none">➡️ Level Berikutnya</button>
+
+<script>
+const correctSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3");
+const wrongSound=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3");
+
+const levels=[
+{
+ nama:"Nabi Yunus AS",
+ icon:"🐳",
+ intro:"Yuk susun kisah Nabi Yunus",
+ cerita:[
+  {order:1,text:"🚢 Nabi Yunus naik kapal"},
+  {order:2,text:"🌊 Datang badai besar"},
+  {order:3,text:"🐳 Ditelan ikan besar"},
+  {order:4,text:"🙏 Nabi Yunus berdoa"}
+ ],
+ ending:"Nabi Yunus selamat karena berdoa kepada Allah"
+},
+{
+ nama:"Nabi Musa AS",
+ icon:"🌊",
+ intro:"Sekarang kisah Nabi Musa",
+ cerita:[
+  {order:1,text:"👶 Nabi Musa dihanyutkan"},
+  {order:2,text:"🏰 Dibesarkan di istana"},
+  {order:3,text:"🔥 Tongkat jadi mukjizat"},
+  {order:4,text:"🌊 Laut terbelah"}
+ ],
+ ending:"Allah menyelamatkan Nabi Musa dan kaumnya"
+},
+{
+ nama:"Nabi Ibrahim AS",
+ icon:"🔥",
+ intro:"Sekarang susun kisah Nabi Ibrahim",
+ cerita:[
+  {order:1,text:"🛠️ Membuat patung"},
+  {order:2,text:"❌ Menolak menyembah patung"},
+  {order:3,text:"🔥 Dilempar ke api"},
+  {order:4,text:"🌟 DiSelamatkan oleh Allah"}
+ ],
+ ending:"Nabi Ibrahim selamat karena Allah melindunginya"
+},
+{
+ nama:"Nabi Nuh AS",
+ icon:"🌈",
+ intro:"Yuk susun kisah Nabi Nuh",
+ cerita:[
+  {order:1,text:"🌧️ Hujan besar turun"},
+  {order:2,text:"🛶 Membangun bahtera"},
+  {order:3,text:"🦁 Mengajak binatang"},
+  {order:4,text:"🌈 Hujan berhenti"}
+ ],
+ ending:"Nabi Nuh dan pengikutnya selamat dari banjir"
+},
+{
+  nama:"Nabi Yusuf AS",
+  icon:"👑",
+  intro:"Yuk susun kisah Nabi Yusuf",
+  cerita:[
+    {order:1,text:"😔 Nabi Yusuf dipisahkan dari keluarganya"},
+    {order:2,text:"🏰 Nabi Yusuf tinggal di istana Mesir"},
+    {order:3,text:"🤲 Nabi Yusuf tetap jujur dan sabar"},
+    {order:4,text:"👑 Nabi Yusuf menjadi pemimpin yang baik"}
+  ],
+  ending:"Karena sabar dan jujur, Nabi Yusuf menjadi pemimpin yang baik"
+}
+
+];
+
+let levelIndex=0;
+let dragged;
+
+function loadLevel(){
+ const lvl=levels[levelIndex];
+ speak(lvl.intro);
+ document.getElementById('levelTitle').innerText=`${lvl.icon} ${lvl.nama}`;
+ document.getElementById('slots').innerHTML='';
+ document.getElementById('cards').innerHTML='';
+ document.getElementById('bar').style.width='0%';
+ document.getElementById('nextBtn').style.display='none';
+
+ lvl.cerita.forEach(c=>{
+  const s=document.createElement('div');
+  s.className='slot';
+  s.dataset.order=c.order;
+  s.innerText=`Urutan ${c.order}`;
+  s.ondragover=e=>e.preventDefault();
+  s.ondrop=()=>drop(s);
+  document.getElementById('slots').appendChild(s);
+ });
+
+ shuffle(lvl.cerita).forEach(c=>{
+  const d=document.createElement('div');
+  d.className='card';
+  d.draggable=true;
+  d.dataset.order=c.order;
+  d.innerText=c.text;
+  d.ondragstart=()=>dragged=d;
+  document.getElementById('cards').appendChild(d);
+ });
+}
+
+function drop(slot){
+ if(slot.dataset.order===dragged.dataset.order){
+  correctSound.play();
+  slot.innerText=dragged.innerText;
+  slot.classList.add('success');
+  dragged.remove();
+  updateProgress();
+  speak("Bagus!");
+  checkWin();
+ }else{
+  wrongSound.play();
+  slot.classList.remove('success');
+  speak("Coba lagi ya");
+ }
+}
+
+function updateProgress(){
+ const total=levels[levelIndex].cerita.length;
+ const done=total-document.querySelectorAll('.card').length;
+ document.getElementById('bar').style.width=(done/total*100)+"%";
+}
+
+function checkWin(){
+ if(document.querySelectorAll('.card').length===0){
+  speak(levels[levelIndex].ending);
+  confetti();
+  document.getElementById('nextBtn').style.display='inline-block';
+ }
+}
+
+function nextLevel(){
+ levelIndex++;
+ if(levelIndex<levels.length){
+  loadLevel();
+ }else{
+  if(levels[levelIndex-1].nama === "Nabi Yusuf AS") {
+    levelIndex = 0; // Reset to Nabi Yunus
+    document.getElementById('nextBtn').innerText = "🔄 Main Lagi";
+    document.getElementById('nextBtn').onclick = loadLevel;
+  } else {
+    confetti();
+    speak("MasyaAllah, kamu hebat sekali!");
+    alert("🎉 Semua level selesai!");
+  }
+ }
+}
+
+function shuffle(arr){
+ return [...arr].sort(()=>Math.random()-.5);
+}
+
+function speak(t){
+ speechSynthesis.cancel();
+ const u=new SpeechSynthesisUtterance(t);
+ u.lang='id-ID';
+ u.rate=.9;
+ speechSynthesis.speak(u);
+}
+
+/* CONFETTI */
+function confetti(){
+ for(let i=0;i<30;i++){
+  const c=document.createElement('div');
+  c.className='confetti';
+  c.style.left=Math.random()*100+"vw";
+  c.style.background=`hsl(${Math.random()*360},100%,60%)`;
+  c.style.animationDuration=2+Math.random()*2+"s";
+  document.body.appendChild(c);
+  setTimeout(()=>c.remove(),4000);
+ }
+}
+
+loadLevel();
+</script>
+
+</body>
+</html>
